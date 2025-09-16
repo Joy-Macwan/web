@@ -1,7 +1,7 @@
 // controllers/adminController.js
 const Assessment = require('../models/assessment');
 const Appointment = require('../models/Appointment');
-const Assessment = require('../models/assessment');
+// const Assessment = require('../models/assessment');
 const ForumPost = require('../models/ForumPost');
 const ChatSession = require('../models/ChatSession');
 
