@@ -1,0 +1,432 @@
+:root {
+  --primary-color: #007bff;
+  --secondary-color: #6c757d;
+  --success-color: #28a745;
+  --danger-color: #dc3545;
+  --warning-color: #ffc107;
+  --info-color: #17a2b8;
+  --light-color: #f8f9fa;
+  --dark-color: #343a40;
+  --border-radius: 0.375rem;
+  --box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  color: var(--dark-color);
+  background-color: #f5f5f5;
+}
+
+/* Navigation */
+.navbar-brand {
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+
+.navbar-nav .nav-link {
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Main Content */
+.main-content {
+  min-height: calc(100vh - 120px);
+  padding-top: 20px;
+}
+
+/* Cards */
+.card {
+  border: none;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+  font-weight: 600;
+}
+
+/* Buttons */
+.btn {
+  border-radius: var(--border-radius);
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  transition: all 0.3s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
+}
+
+/* Forms */
+.form-control {
+  border-radius: var(--border-radius);
+  border: 1px solid #ced4da;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-control:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.form-label {
+  font-weight: 600;
+  color: var(--dark-color);
+}
+
+/* Alerts */
+.alert {
+  border: none;
+  border-radius: var(--border-radius);
+  font-weight: 500;
+}
+
+/* Mental Health Specific Styles */
+.mental-health-hero {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 4rem 0;
+  text-align: center;
+}
+
+.mental-health-hero h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.mental-health-hero p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+}
+
+.feature-card {
+  text-align: center;
+  padding: 2rem 1rem;
+  height: 100%;
+}
+
+.feature-card i {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.feature-card h5 {
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+/* Assessment Styles */
+.question-block {
+  background: #f8f9fa;
+  margin-bottom: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.question-block:hover {
+  background: #e9ecef;
+}
+
+.question-block h6 {
+  color: var(--dark-color);
+  font-weight: 600;
+}
+
+.form-check-input:checked {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+/* Chat Interface */
+.chat-container {
+  background: white;
+  border: 1px solid #dee2e6;
+  padding: 1rem;
+}
+
+.chat-message {
+  margin-bottom: 1rem;
+}
+
+.message-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  margin-right: 0.5rem;
+}
+
+.bot-message .message-avatar {
+  background: var(--primary-color);
+  color: white;
+}
+
+.user-message .message-avatar {
+  background: var(--success-color);
+  color: white;
+}
+
+.message-content {
+  flex: 1;
+  background: #f8f9fa;
+  padding: 0.75rem 1rem;
+  border-radius: var(--border-radius);
+}
+
+.user-message .message-content {
+  background: #e3f2fd;
+}
+
+/* Forum Styles */
+.forum-post {
+  border-left: 4px solid var(--primary-color);
+  padding: 1rem;
+  background: white;
+  margin-bottom: 1rem;
+  border-radius: var(--border-radius);
+}
+
+.forum-post-meta {
+  font-size: 0.875rem;
+  color: var(--secondary-color);
+}
+
+.forum-category {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  background: var(--info-color);
+  color: white;
+  border-radius: var(--border-radius);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Dashboard Styles */
+.dashboard-stat-card {
+  background: linear-gradient(45deg, var(--primary-color), #0056b3);
+  color: white;
+  padding: 1.5rem;
+  border-radius: var(--border-radius);
+  margin-bottom: 1rem;
+}
+
+.dashboard-stat-card h3 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.dashboard-stat-card .icon {
+  font-size: 3rem;
+  opacity: 0.7;
+}
+
+/* Appointment Styles */
+.appointment-item {
+  padding: 1rem;
+  border: 1px solid #dee2e6;
+  border-radius: var(--border-radius);
+  margin-bottom: 0.5rem;
+  background: white;
+}
+
+.appointment-status {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--border-radius);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.appointment-status.scheduled {
+  background: var(--info-color);
+  color: white;
+}
+
+.appointment-status.completed {
+  background: var(--success-color);
+  color: white;
+}
+
+.appointment-status.cancelled {
+  background: var(--danger-color);
+  color: white;
+}
+
+/* Resource Styles */
+.resource-card {
+  border: 1px solid #dee2e6;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  height: 100%;
+}
+
+.resource-card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.resource-type {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  border-radius: var(--border-radius);
+  font-size: 0.75rem;
+}
+
+.resource-rating {
+  color: #ffc107;
+}
+
+/* Sidebar */
+.sidebar {
+  background: white;
+  min-height: calc(100vh - 120px);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+}
+
+.sidebar .nav-link {
+  color: var(--dark-color);
+  padding: 0.75rem 1rem;
+  border-radius: var(--border-radius);
+  margin-bottom: 0.25rem;
+  transition: background-color 0.3s ease;
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+  background: var(--primary-color);
+  color: white;
+}
+
+/* Progress Bars */
+.progress {
+  height: 0.5rem;
+  border-radius: var(--border-radius);
+}
+
+.progress-bar {
+  border-radius: var(--border-radius);
+}
+
+/* Badge Styles */
+.badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.35em 0.65em;
+}
+
+.risk-level-low {
+  background: var(--success-color);
+}
+
+.risk-level-medium {
+  background: var(--warning-color);
+  color: var(--dark-color);
+}
+
+.risk-level-high {
+  background: var(--danger-color);
+}
+
+/* Footer */
+.footer {
+  background: var(--dark-color);
+  color: white;
+  padding: 2rem 0;
+  margin-top: 3rem;
+}
+
+.footer a {
+  color: #adb5bd;
+  text-decoration: none;
+}
+
+.footer a:hover {
+  color: white;
+}
+
+/* Loading Spinner */
+.spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .mental-health-hero h1 {
+    font-size: 2rem;
+  }
+  
+  .mental-health-hero p {
+    font-size: 1rem;
+  }
+  
+  .dashboard-stat-card h3 {
+    font-size: 2rem;
+  }
+  
+  .chat-container {
+    height: 400px !important;
+  }
+  
+  .sidebar {
+    margin-bottom: 1rem;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .card {
+    border: 2px solid var(--dark-color);
+  }
+  
+  .btn {
+    border: 2px solid currentColor;
+  }
+}

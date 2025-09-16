@@ -1,0 +1,94 @@
+<!-- views/partials/navbar.ejs -->
+ 
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">
+            <i class="fas fa-heart"></i> Mental Health Support
+        </a>
+        
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <% if (user) { %>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/resources">Resources</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/forum">Community</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/chat">AI Support</a>
+                    </li>
+                <% } else { %>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/resources">Resources</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/chat">Get Help</a>
+                    </li>
+                <% } %>
+            </ul>
+            
+            <ul class="navbar-nav">
+                <% if (user) { %>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle"></i> <%= user.name %>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/profile">Profile</a></li>
+                            <li><a class="dropdown-item" href="/settings">Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/auth/logout">Logout</a></li>
+                        </ul>
+                    </li>
+                <% } else { %>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/auth/login">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/auth/register">Register</a>
+                    </li>
+                <% } %>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+<!-- Emergency Modal -->
+<div class="modal fade" id="emergencyModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="fas fa-exclamation-triangle"></i> Emergency Support</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>If you are in immediate danger, please call emergency services:</strong></p>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-phone"></i> Emergency: <strong>112</strong></li>
+                    <li><i class="fas fa-phone"></i> Police: <strong>100</strong></li>
+                    <li><i class="fas fa-phone"></i> Mental Health Helpline: <strong>1860-2662-345</strong></li>
+                </ul>
+                
+                <p><strong>Campus Support:</strong></p>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-envelope"></i> counseling@college.edu</li>
+                    <li><i class="fas fa-phone"></i> Campus Security: <strong>Ext. 2222</strong></li>
+                    <li><i class="fas fa-map-marker-alt"></i> Counseling Center: Building A, Room 101</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a href="/chat?emergency=true" class="btn btn-danger">Start Emergency Chat</a>
+            </div>
+        </div>
+    </div>
+</div>

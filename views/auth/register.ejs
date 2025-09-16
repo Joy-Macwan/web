@@ -1,0 +1,107 @@
+<!-- views/auth/register.ejs -->
+
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white text-center">
+                    <h4><i class="fas fa-user-plus"></i> Create Account</h4>
+                </div>
+                <div class="card-body">
+                    <% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+                        <div class="alert alert-danger">
+                            <% errors.forEach(function(error) { %>
+                                <div><%= error.msg %></div>
+                            <% }) %>
+                        </div>
+                    <% } %>
+                    
+                    <form action="/auth/register" method="POST">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="name" class="form-label">Full Name *</label>
+                                <input type="text" class="form-control" id="name" name="name" 
+                                       value="<%= typeof formData !== 'undefined' ? formData.name : '' %>" required>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email Address *</label>
+                                <input type="email" class="form-control" id="email" name="email" 
+                                       value="<%= typeof formData !== 'undefined' ? formData.email : '' %>" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="studentId" class="form-label">Student ID</label>
+                                <input type="text" class="form-control" id="studentId" name="studentId" 
+                                       value="<%= typeof formData !== 'undefined' ? formData.studentId : '' %>">
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="department" class="form-label">Department</label>
+                                <select class="form-control" id="department" name="department">
+                                    <option value="">Select Department</option>
+                                    <option value="Computer Science">Computer Science</option>
+                                    <option value="Engineering">Engineering</option>
+                                    <option value="Psychology">Psychology</option>
+                                    <option value="Business">Business</option>
+                                    <option value="Arts">Arts</option>
+                                    <option value="Sciences">Sciences</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="year" class="form-label">Academic Year</label>
+                            <select class="form-control" id="year" name="year">
+                                <option value="">Select Year</option>
+                                <option value="1">First Year</option>
+                                <option value="2">Second Year</option>
+                                <option value="3">Third Year</option>
+                                <option value="4">Fourth Year</option>
+                                <option value="graduate">Graduate</option>
+                            </select>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="password" class="form-label">Password *</label>
+                                <input type="password" class="form-control" id="password" name="password" required>
+                                <small class="form-text text-muted">Minimum 6 characters</small>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="confirmPassword" class="form-label">Confirm Password *</label>
+                                <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="terms" required>
+                            <label class="form-check-label" for="terms">
+                                I agree to the <a href="/terms" target="_blank">Terms of Service</a> and 
+                                <a href="/privacy" target="_blank">Privacy Policy</a>
+                            </label>
+                        </div>
+                        
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="anonymous">
+                            <label class="form-check-label" for="anonymous">
+                                I prefer to use the platform anonymously when possible
+                            </label>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-success w-100">Create Account</button>
+                    </form>
+                </div>
+                <div class="card-footer text-center">
+                    <small class="text-muted">
+                        Already have an account? <a href="/auth/login">Login here</a>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>"

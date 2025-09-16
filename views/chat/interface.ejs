@@ -1,0 +1,188 @@
+<!-- views/chat/interface.ejs -->
+
+
+<style>
+.chat-message {
+    display: flex;
+    align-items: flex-start;
+}
+
+.bot-message .message-avatar {
+    background: #007bff;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+}
+
+.user-message {
+    flex-direction: row-reverse;
+}
+
+.user-message .message-avatar {
+    background: #28a745;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 10px;
+}
+
+.message-content {
+    background: #f8f9fa;
+    padding: 10px 15px;
+    border-radius: 10px;
+    max-width: 70%;
+}
+
+.user-message .message-content {
+    background: #e3f2fd;
+}
+</style>
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card chat-card">
+                <div class="card-header bg-primary text-white">
+                    <h4><i class="fas fa-robot"></i> AI Mental Health Support</h4>
+                    <small>Available 24/7 for immediate support and guidance</small>
+                </div>
+                
+                <div class="card-body chat-container" id="chatContainer" style="height: 500px; overflow-y: auto;">
+                    <div class="chat-message bot-message mb-3">
+                        <div class="message-avatar">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="message-content">
+                            <p>Hello! I'm your AI mental health support assistant. I'm here to listen, provide coping strategies, and help you navigate your mental health journey.</p>
+                            <p>How are you feeling today? What's on your mind?</p>
+                            <small class="text-muted">Just now</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-footer">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="messageInput" 
+                               placeholder="Type your message here..." maxlength="500">
+                        <button class="btn btn-primary" type="button" id="sendButton">
+                            <i class="fas fa-paper-plane"></i> Send
+                        </button>
+                    </div>
+                    <div class="mt-2">
+                        <small class="text-muted">
+                            <i class="fas fa-shield-alt"></i> Your conversations are private and secure.
+                            In case of emergency, please contact: <a href="tel:112">112</a>
+                        </small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <i class="fas fa-calendar-plus fa-2x text-primary mb-2"></i>
+                            <h6>Need Human Support?</h6>
+                            <a href="/appointments/book" class="btn btn-sm btn-outline-primary">
+                                Book Appointment
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <i class="fas fa-users fa-2x text-success mb-2"></i>
+                            <h6>Join Community</h6>
+                            <a href="/forum" class="btn btn-sm btn-outline-success">
+                                Visit Forum
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <i class="fas fa-book fa-2x text-info mb-2"></i>
+                            <h6>Self-Help Resources</h6>
+                            <a href="/resources" class="btn btn-sm btn-outline-info">
+                                Browse Resources
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+const socket = io();
+const chatContainer = document.getElementById('chatContainer');
+const messageInput = document.getElementById('messageInput');
+const sendButton = document.getElementById('sendButton');
+
+let sessionId = 'session_' + Date.now();
+
+function addMessage(message, isUser = false) {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `chat-message ${isUser ? 'user-message' : 'bot-message'} mb-3`;
+    
+    messageDiv.innerHTML = `
+        <div class="message-avatar">
+            <i class="fas fa-${isUser ? 'user' : 'robot'}"></i>
+        </div>
+        <div class="message-content">
+            <p>${message}</p>
+            <small class="text-muted">Just now</small>
+        </div>
+    `;
+    
+    chatContainer.appendChild(messageDiv);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+}
+
+function sendMessage() {
+    const message = messageInput.value.trim();
+    if (!message) return;
+    
+    addMessage(message, true);
+    messageInput.value = '';
+    
+    // Send to AI bot
+    fetch('/chat/message', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ message, sessionId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.response) {
+            setTimeout(() => {
+                addMessage(data.response);
+            }, 1000);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        addMessage('Sorry, I encountered an error. Please try again.');
+    });
+}
+
+sendButton.addEventListener('click', sendMessage);
+messageInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        sendMessage();
+    }
+});
+</script>

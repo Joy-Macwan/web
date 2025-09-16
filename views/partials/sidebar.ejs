@@ -1,0 +1,278 @@
+<!-- views/partials/sidebar.ejs -->
+ 
+<nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+    <div class="position-sticky pt-3">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link <%= title.includes('Dashboard') ? 'active' : '' %>" href="/dashboard">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+            </li>
+            
+            <% if (user.role === 'student') { %>
+                <li class="nav-item">
+                    <a class="nav-link <%= title.includes('Appointment') ? 'active' : '' %>" href="/appointments">
+                        <i class="fas fa-calendar-check"></i> My Appointments
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <%= title.includes('Assessment') ? 'active' : '' %>" href="/assessments">
+                        <i class="fas fa-clipboard-list"></i> Self Assessments
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/appointments/book">
+                        <i class="fas fa-plus-circle"></i> Book Appointment
+                    </a>
+                </li>
+            <% } %>
+            
+            <% if (user.role === 'counselor') { %>
+                <li class="nav-item">
+                    <a class="nav-link <%= title.includes('Schedule') ? 'active' : '' %>" href="/appointments">
+                        <i class="fas fa-calendar"></i> My Schedule
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/assessments/review">
+                        <i class="fas fa-file-medical"></i> Assessment Reviews
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/students">
+                        <i class="fas fa-user-graduate"></i> My Students
+                    </a>
+                </li>
+            <% } %>
+            
+            <% if (user.role === 'admin') { %>
+                <li class="nav-item">
+                    <a class="nav-link <%= title.includes('Users') ? 'active' : '' %>" href="/admin/users">
+                        <i class="fas fa-users"></i> Manage Users
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <%= title.includes('Analytics') ? 'active' : '' %>" href="/admin/analytics">
+                        <i class="fas fa-chart-bar"></i> Analytics
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <%= title.includes('Reports') ? 'active' : '' %>" href="/admin/reports">
+                        <i class="fas fa-file-alt"></i> Reports
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/moderation">
+                        <i class="fas fa-shield-alt"></i> Content Moderation
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/settings">
+                        <i class="fas fa-cogs"></i> System Settings
+                    </a>
+                </li>
+            <% } %>
+            
+            <!-- Common Navigation Items -->
+            <li class="nav-item mt-3">
+                <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                    <span>Resources & Support</span>
+                </h6>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link <%= title.includes('Resources') ? 'active' : '' %>" href="/resources">
+                    <i class="fas fa-book"></i> Resource Library
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link <%= title.includes('Community') || title.includes('Forum') ? 'active' : '' %>" href="/forum">
+                    <i class="fas fa-comments"></i> Community Forum
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link <%= title.includes('Chat') || title.includes('AI Support') ? 'active' : '' %>" href="/chat">
+                    <i class="fas fa-robot"></i> AI Support Chat
+                </a>
+            </li>
+            
+            <!-- Personal Section -->
+            <li class="nav-item mt-3">
+                <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                    <span>Personal</span>
+                </h6>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link" href="/profile">
+                    <i class="fas fa-user-circle"></i> My Profile
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link" href="/settings">
+                    <i class="fas fa-cog"></i> Settings
+                </a>
+            </li>
+            
+            <% if (user.role === 'student') { %>
+                <li class="nav-item">
+                    <a class="nav-link" href="/progress">
+                        <i class="fas fa-chart-line"></i> My Progress
+                    </a>
+                </li>
+            <% } %>
+        </ul>
+        
+        <hr class="my-3">
+        
+        <!-- Quick Actions Section -->
+        <div class="px-3">
+            <h6 class="sidebar-heading text-muted mb-3">
+                <i class="fas fa-bolt"></i> Quick Actions
+            </h6>
+            
+            <div class="d-grid gap-2">
+                <% if (user.role === 'student') { %>
+                    <a href="/appointments/book" class="btn btn-primary btn-sm">
+                        <i class="fas fa-calendar-plus"></i> Book Appointment
+                    </a>
+                    <a href="/assessments/phq9" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-clipboard-check"></i> Take Assessment
+                    </a>
+                    <a href="/chat?quick=true" class="btn btn-outline-info btn-sm">
+                        <i class="fas fa-comment"></i> Quick Chat
+                    </a>
+                <% } %>
+                
+                <% if (user.role === 'counselor') { %>
+                    <a href="/appointments/today" class="btn btn-primary btn-sm">
+                        <i class="fas fa-calendar-day"></i> Today's Schedule
+                    </a>
+                    <a href="/students/urgent" class="btn btn-warning btn-sm">
+                        <i class="fas fa-exclamation-triangle"></i> Urgent Cases
+                    </a>
+                <% } %>
+                
+                <% if (user.role === 'admin') { %>
+                    <a href="/admin/dashboard" class="btn btn-primary btn-sm">
+                        <i class="fas fa-tachometer-alt"></i> System Overview
+                    </a>
+                    <a href="/admin/analytics" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-chart-bar"></i> Live Analytics
+                    </a>
+                <% } %>
+                
+                <!-- Emergency Help Button - Always Visible -->
+                <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#emergencyModal">
+                    <i class="fas fa-exclamation-triangle"></i> Emergency Help
+                </button>
+            </div>
+        </div>
+        
+        <hr class="my-3">
+        
+        <!-- Mental Health Tips -->
+        <div class="px-3">
+            <h6 class="sidebar-heading text-muted mb-2">
+                <i class="fas fa-lightbulb"></i> Daily Tip
+            </h6>
+            <div class="card border-0 bg-light">
+                <div class="card-body p-2">
+                    <small class="text-muted">
+                        <strong>Mindfulness Reminder:</strong><br>
+                        Take 3 deep breaths and notice how you're feeling right now. Your mental health matters.
+                    </small>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Help & Support Links -->
+        <div class="px-3 mt-3">
+            <h6 class="sidebar-heading text-muted mb-2">
+                <i class="fas fa-question-circle"></i> Need Help?
+            </h6>
+            <ul class="list-unstyled small">
+                <li><a href="/help" class="text-decoration-none"><i class="fas fa-book"></i> User Guide</a></li>
+                <li><a href="/contact" class="text-decoration-none"><i class="fas fa-envelope"></i> Contact Support</a></li>
+                <li><a href="/faq" class="text-decoration-none"><i class="fas fa-question"></i> FAQ</a></li>
+            </ul>
+        </div>
+        
+        <!-- System Status (for admins) -->
+        <% if (user.role === 'admin') { %>
+            <div class="px-3 mt-3">
+                <h6 class="sidebar-heading text-muted mb-2">
+                    <i class="fas fa-server"></i> System Status
+                </h6>
+                <div class="small">
+                    <span class="badge bg-success">
+                        <i class="fas fa-circle"></i> Online
+                    </span>
+                </div>
+            </div>
+        <% } %>
+    </div>
+</nav>
+
+<!-- Emergency Support Modal -->
+<div class="modal fade" id="emergencyModal" tabindex="-1" aria-labelledby="emergencyModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="emergencyModalLabel">
+                    <i class="fas fa-exclamation-triangle"></i> Emergency Support
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning">
+                    <strong>If you are in immediate danger, please call emergency services immediately.</strong>
+                </div>
+                
+                <h6><i class="fas fa-phone"></i> Emergency Contacts</h6>
+                <div class="row">
+                    <div class="col-md-6">
+                        <ul class="list-unstyled">
+                            <li><strong>Emergency Services:</strong> <a href="tel:112" class="text-danger">112</a></li>
+                            <li><strong>Police:</strong> <a href="tel:100" class="text-danger">100</a></li>
+                            <li><strong>Women Helpline:</strong> <a href="tel:1091" class="text-danger">1091</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <ul class="list-unstyled">
+                            <li><strong>KIRAN Helpline:</strong> <a href="tel:1800-599-0019" class="text-danger">1800-599-0019</a></li>
+                            <li><strong>Vandrevala Foundation:</strong> <a href="tel:1860-2662-345" class="text-danger">1860-2662-345</a></li>
+                            <li><strong>iCALL:</strong> <a href="tel:9152987821" class="text-danger">9152987821</a></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <h6 class="mt-3"><i class="fas fa-university"></i> Campus Support</h6>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-envelope"></i> <strong>Email:</strong> counseling@college.edu</li>
+                    <li><i class="fas fa-phone"></i> <strong>Campus Security:</strong> Ext. 2222</li>
+                    <li><i class="fas fa-map-marker-alt"></i> <strong>Counseling Center:</strong> Student Services Building, Room 101</li>
+                    <li><i class="fas fa-clock"></i> <strong>Hours:</strong> Monday-Friday, 8:00 AM - 6:00 PM</li>
+                </ul>
+                
+                <h6 class="mt-3"><i class="fas fa-comments"></i> Online Support</h6>
+                <p class="small text-muted">
+                    If you're not in immediate danger but need someone to talk to right away, 
+                    you can start an emergency chat session with our AI support system.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a href="/chat?emergency=true" class="btn btn-danger">
+                    <i class="fas fa-comment"></i> Start Emergency Chat
+                </a>
+                <a href="/appointments/emergency" class="btn btn-warning">
+                    <i class="fas fa-calendar-plus"></i> Request Urgent Appointment
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
