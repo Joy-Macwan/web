@@ -1,7 +1,7 @@
 // controllers/adminController.js
-const User = require('../models/User');
+const Assessment = require('../models/assessment');
 const Appointment = require('../models/Appointment');
-const Assessment = require('../models/Assessment');
+const Assessment = require('../models/assessment');
 const ForumPost = require('../models/ForumPost');
 const ChatSession = require('../models/ChatSession');
 
@@ -18,7 +18,7 @@ class AdminController {
         User.countDocuments(),
         Appointment.countDocuments(),
         Assessment.countDocuments(),
-        User.countDocuments({ 'mentalHealthStatus.riskLevel': 'high' }),
+        User.countDocuments({ riskLevel: 'high' }), // Changed: removed nested path
         this.getRecentActivity()
       ]);
 
@@ -72,21 +72,28 @@ class AdminController {
   async listUsers(req, res) {
     try {
       const { role, riskLevel, search } = req.query;
-      let query = {};
+      let filter = {};
       
-      if (role) query.role = role;
-      if (riskLevel) query['mentalHealthStatus.riskLevel'] = riskLevel;
+      if (role) filter.role = role;
+      if (riskLevel) filter.riskLevel = riskLevel; // Changed: simplified
+      
+      // For search, we'll handle it differently since Supabase doesn't have $or
+      let users;
       if (search) {
-        query.$or = [
-          { name: { $regex: search, $options: 'i' } },
-          { email: { $regex: search, $options: 'i' } },
-          { studentId: { $regex: search, $options: 'i' } }
-        ];
+        // We'll get users and filter on the backend for now
+        // In production, you might want to use Supabase's text search features
+        const allUsers = await User.find(filter);
+        users = allUsers.filter(user => 
+          user.name?.toLowerCase().includes(search.toLowerCase()) ||
+          user.email?.toLowerCase().includes(search.toLowerCase()) ||
+          user.student_id?.toLowerCase().includes(search.toLowerCase())
+        );
+      } else {
+        users = await User.find(filter);
       }
 
-      const users = await User.find(query)
-        .select('-password')
-        .sort({ createdAt: -1 });
+      // Sort by created_at descending (newest first)
+      users.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
       res.render('admin/users', {
         title: 'User Management',
@@ -137,18 +144,16 @@ class AdminController {
 
   async getModerationQueue(req, res) {
     try {
+      // Note: These methods will need to be implemented in your models
+      // For now, I'm showing the structure
       const [
         reportedPosts,
         highRiskSessions,
         flaggedContent
       ] = await Promise.all([
-        ForumPost.find({ reportCount: { $gt: 0 } })
-          .populate('author', 'name')
-          .sort({ reportCount: -1 }),
-        ChatSession.find({ riskLevel: 'high', needsHumanIntervention: true })
-          .populate('user', 'name email'),
-        Assessment.find({ 'counselorReview.reviewed': false, severity: { $in: ['severe', 'moderately-severe'] } })
-          .populate('user', 'name email')
+        ForumPost.findReported(), // Custom method to be added
+        ChatSession.findHighRisk(), // Custom method to be added
+        Assessment.findUnreviewed() // Custom method to be added
       ]);
 
       res.render('admin/moderation', {
@@ -193,100 +198,166 @@ class AdminController {
   async getRecentActivity() {
     const activities = [];
     
-    const recentUsers = await User.find().sort({ createdAt: -1 }).limit(5);
-    const recentAssessments = await Assessment.find().sort({ createdAt: -1 }).limit(5).populate('user', 'name');
-    const recentAppointments = await Appointment.find().sort({ createdAt: -1 }).limit(5).populate('student', 'name');
-    
-    recentUsers.forEach(user => {
-      activities.push({
-        type: 'user_registered',
-        description: `${user.name} registered`,
-        timestamp: user.createdAt
+    try {
+      // Get recent users (last 5)
+      const recentUsers = await User.find({});
+      const lastFiveUsers = recentUsers
+        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+        .slice(0, 5);
+      
+      // Get recent assessments with user info
+      const recentAssessments = await Assessment.findWithUser(); // You'll need to implement this
+      const lastFiveAssessments = recentAssessments
+        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+        .slice(0, 5);
+      
+      // Get recent appointments with student info
+      const recentAppointments = await Appointment.findWithUser(); // You'll need to implement this
+      const lastFiveAppointments = recentAppointments
+        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+        .slice(0, 5);
+      
+      // Add to activities array
+      lastFiveUsers.forEach(user => {
+        activities.push({
+          type: 'user_registered',
+          description: `${user.name} registered`,
+          timestamp: new Date(user.created_at)
+        });
       });
-    });
-    
-    recentAssessments.forEach(assessment => {
-      activities.push({
-        type: 'assessment_taken',
-        description: `${assessment.user.name} took ${assessment.type} assessment`,
-        timestamp: assessment.createdAt
+      
+      lastFiveAssessments.forEach(assessment => {
+        activities.push({
+          type: 'assessment_taken',
+          description: `${assessment.users?.name || 'Unknown'} took ${assessment.type} assessment`,
+          timestamp: new Date(assessment.created_at)
+        });
       });
-    });
-    
-    return activities.sort((a, b) => b.timestamp - a.timestamp).slice(0, 10);
+      
+      // Sort all activities by timestamp and return top 10
+      return activities.sort((a, b) => b.timestamp - a.timestamp).slice(0, 10);
+    } catch (error) {
+      console.error('Error getting recent activity:', error);
+      return [];
+    }
   }
 
+  // These methods need to be rewritten for Supabase
+  // Since Supabase doesn't have MongoDB's aggregation, we'll do basic queries
   async getUserGrowthData() {
-    return await User.aggregate([
-      {
-        $group: {
-          _id: {
-            year: { $year: '$createdAt' },
-            month: { $month: '$createdAt' }
-          },
-          count: { $sum: 1 }
-        }
-      },
-      { $sort: { '_id.year': 1, '_id.month': 1 } }
-    ]);
+    try {
+      const users = await User.find({});
+      const monthlyData = {};
+      
+      users.forEach(user => {
+        const date = new Date(user.created_at);
+        const key = `${date.getFullYear()}-${date.getMonth() + 1}`;
+        monthlyData[key] = (monthlyData[key] || 0) + 1;
+      });
+      
+      return Object.keys(monthlyData).map(key => {
+        const [year, month] = key.split('-');
+        return {
+          _id: { year: parseInt(year), month: parseInt(month) },
+          count: monthlyData[key]
+        };
+      }).sort((a, b) => {
+        if (a._id.year !== b._id.year) return a._id.year - b._id.year;
+        return a._id.month - b._id.month;
+      });
+    } catch (error) {
+      console.error('Error getting user growth data:', error);
+      return [];
+    }
   }
 
   async getAssessmentTrendsData() {
-    return await Assessment.aggregate([
-      {
-        $group: {
-          _id: {
-            type: '$type',
-            severity: '$severity'
-          },
-          count: { $sum: 1 }
-        }
-      }
-    ]);
+    try {
+      const assessments = await Assessment.find({});
+      const trends = {};
+      
+      assessments.forEach(assessment => {
+        const key = `${assessment.type}-${assessment.severity}`;
+        trends[key] = (trends[key] || 0) + 1;
+      });
+      
+      return Object.keys(trends).map(key => {
+        const [type, severity] = key.split('-');
+        return {
+          _id: { type, severity },
+          count: trends[key]
+        };
+      });
+    } catch (error) {
+      console.error('Error getting assessment trends:', error);
+      return [];
+    }
   }
 
   async getRiskLevelDistribution() {
-    return await User.aggregate([
-      {
-        $group: {
-          _id: '$mentalHealthStatus.riskLevel',
-          count: { $sum: 1 }
-        }
-      }
-    ]);
+    try {
+      const users = await User.find({});
+      const distribution = {};
+      
+      users.forEach(user => {
+        const riskLevel = user.riskLevel || 'unknown';
+        distribution[riskLevel] = (distribution[riskLevel] || 0) + 1;
+      });
+      
+      return Object.keys(distribution).map(riskLevel => ({
+        _id: riskLevel,
+        count: distribution[riskLevel]
+      }));
+    } catch (error) {
+      console.error('Error getting risk level distribution:', error);
+      return [];
+    }
   }
 
   async getDepartmentStats() {
-    return await User.aggregate([
-      {
-        $group: {
-          _id: '$department',
-          count: { $sum: 1 },
-          highRisk: {
-            $sum: {
-              $cond: [{ $eq: ['$mentalHealthStatus.riskLevel', 'high'] }, 1, 0]
-            }
-          }
+    try {
+      const users = await User.find({});
+      const stats = {};
+      
+      users.forEach(user => {
+        const dept = user.department || 'Unknown';
+        if (!stats[dept]) {
+          stats[dept] = { count: 0, highRisk: 0 };
         }
-      }
-    ]);
+        stats[dept].count += 1;
+        if (user.riskLevel === 'high') {
+          stats[dept].highRisk += 1;
+        }
+      });
+      
+      return Object.keys(stats).map(department => ({
+        _id: department,
+        count: stats[department].count,
+        highRisk: stats[department].highRisk
+      }));
+    } catch (error) {
+      console.error('Error getting department stats:', error);
+      return [];
+    }
   }
 
   async moderatePost(postId, action, notes, moderatorId) {
     const post = await ForumPost.findById(postId);
     if (!post) throw new Error('Post not found');
     
-    post.isModerated = true;
-    post.moderatedBy = moderatorId;
-    post.moderationNotes = notes;
+    const updateData = {
+      is_moderated: true,
+      moderated_by: moderatorId,
+      moderation_notes: notes
+    };
     
     if (action === 'delete') {
-      await ForumPost.deleteOne({ _id: postId });
+      await ForumPost.findByIdAndDelete(postId);
     } else if (action === 'lock') {
-      post.isLocked = true;
-      await post.save();
+      updateData.is_locked = true;
+      await ForumPost.findByIdAndUpdate(postId, updateData);
     } else {
-      await post.save();
+      await ForumPost.findByIdAndUpdate(postId, updateData);
     }
     
     return { success: true };
@@ -296,12 +367,13 @@ class AdminController {
     const session = await ChatSession.findById(sessionId);
     if (!session) throw new Error('Session not found');
     
+    const updateData = {};
     if (action === 'escalate') {
-      session.escalatedTo = moderatorId;
-      session.needsHumanIntervention = false;
+      updateData.escalated_to = moderatorId;
+      updateData.needs_human_intervention = false;
     }
     
-    await session.save();
+    await ChatSession.findByIdAndUpdate(sessionId, updateData);
     return { success: true };
   }
 
@@ -309,12 +381,14 @@ class AdminController {
     const assessment = await Assessment.findById(assessmentId);
     if (!assessment) throw new Error('Assessment not found');
     
-    assessment.counselorReview.reviewed = true;
-    assessment.counselorReview.reviewedBy = moderatorId;
-    assessment.counselorReview.reviewDate = new Date();
-    assessment.counselorReview.notes = notes;
+    const updateData = {
+      reviewed: true,
+      reviewed_by: moderatorId,
+      review_date: new Date().toISOString(),
+      review_notes: notes
+    };
     
-    await assessment.save();
+    await Assessment.findByIdAndUpdate(assessmentId, updateData);
     return { success: true };
   }
 }

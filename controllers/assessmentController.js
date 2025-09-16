@@ -1,24 +1,31 @@
 // controllers/assessmentController.js
-const Assessment = require('../models/Assessment');
+const { supabase } = require('../utils/supabase');
 const { calculatePHQ9Score, calculateGAD7Score, calculateGHQScore } = require('../utils/assessmentScoring');
 
 class AssessmentController {
+  // List all assessments for logged-in user
   async listAssessments(req, res) {
     try {
-      const assessments = await Assessment.find({ user: req.session.user.id })
-        .sort({ createdAt: -1 });
+      const { data: assessments, error } = await supabase
+        .from('assessments')
+        .select('*')
+        .eq('user_id', req.session.user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
 
       res.render('assessments/index', {
         title: 'Mental Health Assessments',
         assessments
       });
     } catch (error) {
-      console.error('List assessments error:', error);
+      console.error('List assessments error:', error.message);
       req.flash('error', 'Failed to load assessments');
       res.redirect('/dashboard');
     }
   }
 
+  // Render PHQ9 form
   renderPHQ9(req, res) {
     const questions = [
       "Little interest or pleasure in doing things",
@@ -38,42 +45,52 @@ class AssessmentController {
     });
   }
 
+  // Handle PHQ9 submission
   async submitPHQ9(req, res) {
     try {
       const answers = req.body.answers;
       const { totalScore, severity, recommendations } = calculatePHQ9Score(answers);
 
-      const assessment = new Assessment({
-        user: req.session.user.id,
-        type: 'PHQ9',
-        questions: answers.map((answer, index) => ({
-          question: `PHQ9_Q${index + 1}`,
-          answer,
-          score: parseInt(answer)
-        })),
-        totalScore,
-        severity,
-        recommendations
-      });
+      const { data, error } = await supabase
+        .from('assessments')
+        .insert([{
+          user_id: req.session.user.id,
+          type: 'PHQ9',
+          questions: answers.map((ans, i) => ({
+            question: `PHQ9_Q${i + 1}`,
+            answer: ans,
+            score: parseInt(ans)
+          })),
+          total_score: totalScore,
+          severity,
+          recommendations
+        }])
+        .select()
+        .single();
 
-      await assessment.save();
+      if (error) throw error;
 
       // Update user's mental health status
-      const User = require('../models/User');
-      await User.findByIdAndUpdate(req.session.user.id, {
-        'mentalHealthStatus.lastAssessment': new Date(),
-        'mentalHealthStatus.riskLevel': severity === 'severe' ? 'high' : 
-                                       severity === 'moderate' ? 'medium' : 'low'
-      });
+      const riskLevel = severity === 'severe' ? 'high' :
+                        severity === 'moderate' ? 'medium' : 'low';
 
-      res.redirect(`/assessments/results/${assessment._id}`);
+      await supabase
+        .from('users')
+        .update({
+          last_assessment: new Date(),
+          risk_level: riskLevel
+        })
+        .eq('id', req.session.user.id);
+
+      res.redirect(`/assessments/results/${data.id}`);
     } catch (error) {
-      console.error('Submit PHQ9 error:', error);
+      console.error('Submit PHQ9 error:', error.message);
       req.flash('error', 'Failed to submit assessment');
       res.redirect('/assessments/phq9');
     }
   }
 
+  // Render GAD7
   renderGAD7(req, res) {
     const questions = [
       "Feeling nervous, anxious, or on edge",
@@ -91,72 +108,89 @@ class AssessmentController {
     });
   }
 
+  // Submit GAD7
   async submitGAD7(req, res) {
     try {
       const answers = req.body.answers;
       const { totalScore, severity, recommendations } = calculateGAD7Score(answers);
 
-      const assessment = new Assessment({
-        user: req.session.user.id,
-        type: 'GAD7',
-        questions: answers.map((answer, index) => ({
-          question: `GAD7_Q${index + 1}`,
-          answer,
-          score: parseInt(answer)
-        })),
-        totalScore,
-        severity,
-        recommendations
-      });
+      const { data, error } = await supabase
+        .from('assessments')
+        .insert([{
+          user_id: req.session.user.id,
+          type: 'GAD7',
+          questions: answers.map((ans, i) => ({
+            question: `GAD7_Q${i + 1}`,
+            answer: ans,
+            score: parseInt(ans)
+          })),
+          total_score: totalScore,
+          severity,
+          recommendations
+        }])
+        .select()
+        .single();
 
-      await assessment.save();
-      res.redirect(`/assessments/results/${assessment._id}`);
+      if (error) throw error;
+
+      res.redirect(`/assessments/results/${data.id}`);
     } catch (error) {
-      console.error('Submit GAD7 error:', error);
+      console.error('Submit GAD7 error:', error.message);
       req.flash('error', 'Failed to submit assessment');
       res.redirect('/assessments/gad7');
     }
   }
 
+  // Render GHQ
   renderGHQ(req, res) {
     res.render('assessments/ghq', {
       title: 'GHQ General Health Assessment'
     });
   }
 
+  // Submit GHQ
   async submitGHQ(req, res) {
     try {
       const answers = req.body.answers;
       const { totalScore, severity, recommendations } = calculateGHQScore(answers);
 
-      const assessment = new Assessment({
-        user: req.session.user.id,
-        type: 'GHQ',
-        questions: answers.map((answer, index) => ({
-          question: `GHQ_Q${index + 1}`,
-          answer,
-          score: parseInt(answer)
-        })),
-        totalScore,
-        severity,
-        recommendations
-      });
+      const { data, error } = await supabase
+        .from('assessments')
+        .insert([{
+          user_id: req.session.user.id,
+          type: 'GHQ',
+          questions: answers.map((ans, i) => ({
+            question: `GHQ_Q${i + 1}`,
+            answer: ans,
+            score: parseInt(ans)
+          })),
+          total_score: totalScore,
+          severity,
+          recommendations
+        }])
+        .select()
+        .single();
 
-      await assessment.save();
-      res.redirect(`/assessments/results/${assessment._id}`);
+      if (error) throw error;
+
+      res.redirect(`/assessments/results/${data.id}`);
     } catch (error) {
-      console.error('Submit GHQ error:', error);
+      console.error('Submit GHQ error:', error.message);
       req.flash('error', 'Failed to submit assessment');
       res.redirect('/assessments/ghq');
     }
   }
 
+  // Get results
   async getResults(req, res) {
     try {
-      const assessment = await Assessment.findById(req.params.id)
-        .populate('user', 'name');
+      const { data: assessment, error } = await supabase
+        .from('assessments')
+        .select('*, user:users(name)')
+        .eq('id', req.params.id)
+        .single();
 
-      if (!assessment) {
+      if (error || !assessment) {
         req.flash('error', 'Assessment not found');
         return res.redirect('/assessments');
       }
@@ -166,7 +200,7 @@ class AssessmentController {
         assessment
       });
     } catch (error) {
-      console.error('Get results error:', error);
+      console.error('Get results error:', error.message);
       req.flash('error', 'Failed to load results');
       res.redirect('/assessments');
     }
